@@ -1,8 +1,6 @@
 package com.vvs;
 
 import com.github.javaparser.ast.CompilationUnit;
-import com.vvs.CodeParser;
-import com.vvs.MutationGenerator;
 
 public class MutationTestingTool {
 
@@ -13,16 +11,14 @@ public class MutationTestingTool {
     public void run(String javaFilePath) {
         CodeParser parser = new CodeParser(javaFilePath);
         CompilationUnit ast = parser.getAST();
-        // pass a deep copy of the AST to the mutation generator
-        MutationGenerator generator = new MutationGenerator(ast.clone());
         System.out.println("Original:\n" + ast);
         System.out.println("================");
-        System.out.println("Mutated:\n");
+        AridNodeDetector aridNodeDetector = new AridNodeDetector(ast);
+        MutationGenerator generator = new MutationGenerator(ast, aridNodeDetector);
         CompilationUnit mutatedAst = generator.generate();
+        System.out.println("Mutated:\n");
         System.out.println(mutatedAst);
-        // aridCodeDetector.detect(cu);
-        // mutationGenerator.generate(cu);
-        // testRunner.run(cu);
-        // analysisEngine.analyze(cu);
+        // TODO: run tests
+        // TODO: generate report
     }
 }
