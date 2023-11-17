@@ -5,6 +5,6 @@ public class App
     public static void main( String[] args )
     {
         MutationTestingTool tool = new MutationTestingTool();
-        tool.run("src/main/resources/Sample.java");
+        tool.run("src/main/resources/Sample.java", 100);
     }
 }

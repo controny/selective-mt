@@ -1,7 +1,7 @@
 package com.vvs;
 
 import com.github.javaparser.ast.CompilationUnit;
-import com.github.javaparser.ast.stmt.Statement;
+import com.github.javaparser.ast.Node;
 
 
 public class AridNodeDetector {
@@ -11,7 +11,7 @@ public class AridNodeDetector {
         cu = ast;
     }
 
-    public boolean isArid(Statement node) {
+    public boolean isArid(Node node) {
         // TODO: implement the detection logic
         return false;
     }

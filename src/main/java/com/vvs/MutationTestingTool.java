@@ -8,16 +8,23 @@ public class MutationTestingTool {
 
     }
 
-    public void run(String javaFilePath) {
+    public void run(String javaFilePath, int maxMutations) {
         CodeParser parser = new CodeParser(javaFilePath);
         CompilationUnit ast = parser.getAST();
         System.out.println("Original:\n" + ast);
-        System.out.println("================");
         AridNodeDetector aridNodeDetector = new AridNodeDetector(ast);
-        MutationGenerator generator = new MutationGenerator(ast, aridNodeDetector);
-        CompilationUnit mutatedAst = generator.generate();
-        System.out.println("Mutated:\n");
-        System.out.println(mutatedAst);
+        MutationGenerator generator = new MutationGenerator(ast, aridNodeDetector, maxMutations);
+        int index = 1;
+        for (CompilationUnit mutatedAst : generator) {
+            System.out.println("================");
+            System.out.println("Mutant " + index + ":");
+            if (mutatedAst.toString().equals(ast.toString())) {
+                System.out.println("No mutation");
+            } else {
+                System.out.println(mutatedAst);
+            }
+            index++;
+        }
         // TODO: run tests
         // TODO: generate report
     }
