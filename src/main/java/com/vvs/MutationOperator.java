@@ -1,6 +1,10 @@
 package com.vvs;
 
+import java.util.Arrays;
+import java.util.List;
 import java.util.Random;
+import java.util.function.Consumer;
+import java.util.function.Function;
 
 import com.github.javaparser.ast.Node;
 import com.github.javaparser.ast.expr.BinaryExpr;
@@ -23,6 +27,14 @@ public class MutationOperator extends ModifierVisitor<Void> {
         BinaryExpr.Operator.AND,
         BinaryExpr.Operator.OR
     };
+    private BinaryExpr.Operator[] relationalOperators = {
+        BinaryExpr.Operator.LESS,
+        BinaryExpr.Operator.LESS_EQUALS,
+        BinaryExpr.Operator.GREATER,
+        BinaryExpr.Operator.GREATER_EQUALS,
+        BinaryExpr.Operator.EQUALS,
+        BinaryExpr.Operator.NOT_EQUALS
+    };
 
     public MutationOperator(AridNodeDetector detector) {
         super();
@@ -34,21 +46,24 @@ public class MutationOperator extends ModifierVisitor<Void> {
         if (!shouldSkip(n)) {
             BinaryExpr ori = n.clone();
 
-            // Arithmetic operator replacement (AOR)
-            Node replacement = replaceArithmeticOperator(n);
-            if (replacement != null) {
-                n.replace(replacement);
-                System.out.println("AOR: " + ori + " -> " + replacement);
-                return replacement;
-            }
+            // iterate through all the potential mutation functions
+            List<Function<BinaryExpr, Node>> mutationFunctions = Arrays.asList(
+                this::replaceArithmeticOperator,
+                this::replaceLogicalConnector,
+                this::replaceRelationalOperator
+            );
 
-            // Logical connector replacement (LCR)
-            replacement = replaceLogicalConnector(n);
-            if (replacement != null) {
-                n.replace(replacement);
-                System.out.println("LCR: " + ori + " -> " + replacement);
-                return replacement;
-            }
+            for (Function<BinaryExpr, Node> function : mutationFunctions) {
+                Node replacement = function.apply(n);
+                if (replacement != null) {
+                    System.out.println("Line " + currentLine + " : " + ori + " -> " + replacement);
+                    if (n != replacement) {
+                        n.replace(replacement);
+                        return replacement;
+                    }
+                    break;
+                }
+            } 
         }
         return super.visit(n, arg);
     }
@@ -121,6 +136,29 @@ public class MutationOperator extends ModifierVisitor<Void> {
                 } else {
                     // replace the binary expression with true/false
                     boolean boolValue = (opIndex == logicalConnectors.length + 2);
+                    Node replacement = new BooleanLiteralExpr(boolValue);
+                    return replacement;
+                }
+            }
+        }
+        return null;
+    }
+
+    private Node replaceRelationalOperator(BinaryExpr n) {
+        // Relational operator replacement (ROR)
+        // Randomly replace a relational expression with {a < b, a <= b, a >= b, true, false}
+        BinaryExpr.Operator op = n.getOperator();
+        for (int i = 0; i < relationalOperators.length; i++) {
+            if (relationalOperators[i] == op) {
+                int opIndex = pickReplacementIndex(relationalOperators.length + 2, i);
+                if (opIndex < relationalOperators.length) {
+                    // replace the operator with another one
+                    BinaryExpr.Operator newOp = relationalOperators[opIndex];
+                    n.setOperator(newOp);
+                    return n;
+                } else {
+                    // replace the binary expression with true/false
+                    boolean boolValue = (opIndex == relationalOperators.length);
                     Node replacement = new BooleanLiteralExpr(boolValue);
                     return replacement;
                 }

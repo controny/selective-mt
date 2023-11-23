@@ -2,7 +2,7 @@ import com.github.javaparser.utils.CodeGenerationUtils;
 import com.github.javaparser.utils.SourceRoot;
 
 public class Sample {
-    int isEven(int number) {
+    int foo(int number) {
         int a = 1;
         int b = 2;
         boolean c = true;
