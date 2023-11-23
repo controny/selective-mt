@@ -15,16 +15,19 @@ public class MutationTestingTool {
         AridNodeDetector aridNodeDetector = new AridNodeDetector(ast);
         MutationGenerator generator = new MutationGenerator(ast, aridNodeDetector, maxMutations);
         int index = 1;
+        int numMutants = 0;
         for (CompilationUnit mutatedAst : generator) {
             System.out.println("Mutant " + index + ":");
             if (mutatedAst.toString().equals(ast.toString())) {
                 System.out.println("No mutation");
             } else {
                 System.out.println(mutatedAst);
+                numMutants++;
             }
             index++;
             System.out.println("================");
         }
+        System.out.println("Total mutants: " + numMutants);
         // TODO: run tests
         // TODO: generate report
     }

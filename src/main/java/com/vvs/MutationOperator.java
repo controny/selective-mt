@@ -9,6 +9,8 @@ import java.util.function.Function;
 import com.github.javaparser.ast.Node;
 import com.github.javaparser.ast.expr.BinaryExpr;
 import com.github.javaparser.ast.expr.BooleanLiteralExpr;
+import com.github.javaparser.ast.expr.NameExpr;
+import com.github.javaparser.ast.expr.UnaryExpr;
 import com.github.javaparser.ast.visitor.ModifierVisitor;
 import com.github.javaparser.ast.visitor.Visitable;
 
@@ -34,6 +36,15 @@ public class MutationOperator extends ModifierVisitor<Void> {
         BinaryExpr.Operator.GREATER_EQUALS,
         BinaryExpr.Operator.EQUALS,
         BinaryExpr.Operator.NOT_EQUALS
+    };
+    private UnaryExpr.Operator[] unaryOperators = {
+        UnaryExpr.Operator.POSTFIX_INCREMENT,
+        UnaryExpr.Operator.POSTFIX_DECREMENT,
+        UnaryExpr.Operator.PREFIX_INCREMENT,
+        UnaryExpr.Operator.PREFIX_DECREMENT,
+        UnaryExpr.Operator.LOGICAL_COMPLEMENT,
+        UnaryExpr.Operator.BITWISE_COMPLEMENT,
+        UnaryExpr.Operator.MINUS
     };
 
     public MutationOperator(AridNodeDetector detector) {
@@ -64,6 +75,22 @@ public class MutationOperator extends ModifierVisitor<Void> {
                     break;
                 }
             } 
+        }
+        return super.visit(n, arg);
+    }
+
+    @Override
+    public Visitable visit(NameExpr n, Void arg) {
+        if (!shouldSkip(n)) {
+            // randomly choose to insert or not
+            int random = new Random().nextInt(10);
+            if (random == 0) {
+                NameExpr ori = n.clone();
+                Node replacement = insertUnaryOperator(n);
+                System.out.println("Line " + currentLine + " : " + ori + " -> " + replacement);
+                n.replace(replacement);
+                return replacement;
+            }
         }
         return super.visit(n, arg);
     }
@@ -165,5 +192,14 @@ public class MutationOperator extends ModifierVisitor<Void> {
             }
         }
         return null;
+    }
+
+    private Node insertUnaryOperator(NameExpr n) {
+        // Unary operator insertion (UOI)
+        // Randomly insert a unary operator {++, --, !, ~, -} to a variable
+        int opIndex = pickReplacementIndex(unaryOperators.length, -1);
+        NameExpr nameExpr = new NameExpr(n.getName());
+        Node newNode = new UnaryExpr(nameExpr, unaryOperators[opIndex]);
+        return newNode;
     }
 }
