@@ -16,7 +16,6 @@ public class MutationTestingTool {
         MutationGenerator generator = new MutationGenerator(ast, aridNodeDetector, maxMutations);
         int index = 1;
         for (CompilationUnit mutatedAst : generator) {
-            System.out.println("================");
             System.out.println("Mutant " + index + ":");
             if (mutatedAst.toString().equals(ast.toString())) {
                 System.out.println("No mutation");
@@ -24,6 +23,7 @@ public class MutationTestingTool {
                 System.out.println(mutatedAst);
             }
             index++;
+            System.out.println("================");
         }
         // TODO: run tests
         // TODO: generate report

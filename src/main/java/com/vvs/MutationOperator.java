@@ -1,7 +1,10 @@
 package com.vvs;
 
+import java.util.Random;
+
 import com.github.javaparser.ast.Node;
 import com.github.javaparser.ast.expr.BinaryExpr;
+import com.github.javaparser.ast.expr.BooleanLiteralExpr;
 import com.github.javaparser.ast.visitor.ModifierVisitor;
 import com.github.javaparser.ast.visitor.Visitable;
 
@@ -9,22 +12,49 @@ import com.github.javaparser.ast.visitor.Visitable;
 public class MutationOperator extends ModifierVisitor<Void> {
     private AridNodeDetector aridDetector;
     private int currentLine;
+    private BinaryExpr.Operator[] arithmeticOperators = {
+        BinaryExpr.Operator.PLUS,
+        BinaryExpr.Operator.MINUS,
+        BinaryExpr.Operator.MULTIPLY,
+        BinaryExpr.Operator.DIVIDE,
+        BinaryExpr.Operator.REMAINDER
+    };
+    private BinaryExpr.Operator[] logicalConnectors = {
+        BinaryExpr.Operator.AND,
+        BinaryExpr.Operator.OR
+    };
 
     public MutationOperator(AridNodeDetector detector) {
         super();
         aridDetector = detector;
-        currentLine = 1; // start from the first line
     }
 
     @Override
     public Visitable visit(BinaryExpr n, Void arg) {
         if (!shouldSkip(n)) {
-            if (n.getOperator() == BinaryExpr.Operator.EQUALS) {
-                n.setOperator(BinaryExpr.Operator.NOT_EQUALS);
+            BinaryExpr ori = n.clone();
+
+            // Arithmetic operator replacement (AOR)
+            Node replacement = replaceArithmeticOperator(n);
+            if (replacement != null) {
+                n.replace(replacement);
+                System.out.println("AOR: " + ori + " -> " + replacement);
+                return replacement;
+            }
+
+            // Logical connector replacement (LCR)
+            replacement = replaceLogicalConnector(n);
+            if (replacement != null) {
+                n.replace(replacement);
+                System.out.println("LCR: " + ori + " -> " + replacement);
+                return replacement;
             }
         }
-        currentLine++;
         return super.visit(n, arg);
+    }
+
+    public void setLineToVisit(int line) {
+        currentLine = line;
     }
 
     public boolean shouldSkip(Node n) {
@@ -40,5 +70,62 @@ public class MutationOperator extends ModifierVisitor<Void> {
         }
 
         return false;
+    }
+
+    private int pickReplacementIndex(int opSize, int oriIndex) {
+        int randomIndex = oriIndex;
+        do {
+            randomIndex = new Random().nextInt(opSize);
+        } while (randomIndex == oriIndex);
+        return randomIndex;
+    }
+
+    private Node replaceArithmeticOperator(BinaryExpr n) {
+        // Arithmetic operator replacement (AOR)
+        // Randomly replace an arithmetic expression with {a, b, a − b, a * b, a / b, a % b}
+        BinaryExpr.Operator op = n.getOperator();
+        for (int i = 0; i < arithmeticOperators.length; i++) {
+            if (arithmeticOperators[i] == op) {
+                int opIndex = pickReplacementIndex(arithmeticOperators.length + 2, i);
+                if (opIndex < arithmeticOperators.length) {
+                    // replace the operator with another one
+                    BinaryExpr.Operator newOp = arithmeticOperators[opIndex];
+                    n.setOperator(newOp);
+                    return n;
+                } else {
+                    // replace the binary expression with one of the operands
+                    Node replacement = opIndex == arithmeticOperators.length ? n.getLeft() : n.getRight();
+                    return replacement;
+                }
+            }
+        }
+        return null;
+    }
+
+    private Node replaceLogicalConnector(BinaryExpr n) {
+        // Logical connector replacement (LCR)
+        // Randomly replace a logical expression with {a, b, a || b, true, false}
+        BinaryExpr.Operator op = n.getOperator();
+        for (int i = 0; i < logicalConnectors.length; i++) {
+            if (logicalConnectors[i] == op) {
+                int opIndex = pickReplacementIndex(logicalConnectors.length + 4, i);
+                if (opIndex < logicalConnectors.length) {
+                    // replace the operator with another one
+                    BinaryExpr.Operator newOp = logicalConnectors[opIndex];
+                    n.setOperator(newOp);
+                    return n;
+                } else if (opIndex < logicalConnectors.length + 2) {
+                    // replace the binary expression with one of the operands
+                    Node replacement = opIndex == logicalConnectors.length ? n.getLeft() : n.getRight();
+                    return replacement;
+                } else {
+                    // replace the binary expression with true/false
+                    boolean boolValue = (opIndex == logicalConnectors.length + 2);
+                    Node replacement = new BooleanLiteralExpr(boolValue);
+                    return replacement;
+                }
+            }
+        }
+        return null;
     }
 }

@@ -2,11 +2,16 @@ import com.github.javaparser.utils.CodeGenerationUtils;
 import com.github.javaparser.utils.SourceRoot;
 
 public class Sample {
-    boolean isEven(int number) {
+    int isEven(int number) {
+        int a = 1;
+        int b = 2;
+        boolean c = true;
+        boolean d = false;
+        boolean e = c && d;
         if (number == 0) {
-            return true;
+            return a + b;
         } else {
-            return false;
+            return a - b;
         }
     }
 }
