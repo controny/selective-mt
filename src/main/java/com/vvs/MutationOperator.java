@@ -11,6 +11,7 @@ import com.github.javaparser.ast.expr.BinaryExpr;
 import com.github.javaparser.ast.expr.BooleanLiteralExpr;
 import com.github.javaparser.ast.expr.NameExpr;
 import com.github.javaparser.ast.expr.UnaryExpr;
+import com.github.javaparser.ast.stmt.BlockStmt;
 import com.github.javaparser.ast.visitor.ModifierVisitor;
 import com.github.javaparser.ast.visitor.Visitable;
 
@@ -90,6 +91,21 @@ public class MutationOperator extends ModifierVisitor<Void> {
                 System.out.println("Line " + currentLine + " : " + ori + " -> " + replacement);
                 n.replace(replacement);
                 return replacement;
+            }
+        }
+        return super.visit(n, arg);
+    }
+
+    @Override
+    public Visitable visit(BlockStmt n, Void arg) {
+        if (!shouldSkip(n)) {
+            // Statement block removal (SBR)
+            // randomly choose to remove or not
+            int random = new Random().nextInt(10);
+            if (random == 0) {
+                n.remove();
+                System.out.println("Line " + currentLine + " : REMOVE " + n);
+                return null;
             }
         }
         return super.visit(n, arg);
