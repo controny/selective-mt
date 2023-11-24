@@ -39,6 +39,7 @@ public class MutationGenerator implements Iterable<CompilationUnit> {
             @Override
             public CompilationUnit next() {
                 CompilationUnit cu = originalAST.clone();
+                mutationOperator.setLineToVisit(count + 1);
                 mutationOperator.visit(cu, null);
                 count++;
                 return cu;
