@@ -35,4 +35,9 @@ public class AppTest
     {
         assertTrue( true );
     }
+
+    @org.junit.Test
+    public void zeroTest(int n){
+
+    }
 }
