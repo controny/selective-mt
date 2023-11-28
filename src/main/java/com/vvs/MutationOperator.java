@@ -3,7 +3,6 @@ package com.vvs;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
-import java.util.function.Consumer;
 import java.util.function.Function;
 
 import com.github.javaparser.ast.Node;
@@ -11,6 +10,7 @@ import com.github.javaparser.ast.expr.BinaryExpr;
 import com.github.javaparser.ast.expr.BooleanLiteralExpr;
 import com.github.javaparser.ast.expr.NameExpr;
 import com.github.javaparser.ast.expr.UnaryExpr;
+import com.github.javaparser.ast.stmt.AssertStmt;
 import com.github.javaparser.ast.stmt.BlockStmt;
 import com.github.javaparser.ast.visitor.ModifierVisitor;
 import com.github.javaparser.ast.visitor.Visitable;
@@ -99,7 +99,22 @@ public class MutationOperator extends ModifierVisitor<Void> {
     @Override
     public Visitable visit(BlockStmt n, Void arg) {
         if (!shouldSkip(n)) {
-            // Statement block removal (SBR)
+            // Statement removal (SR)
+            // randomly choose to remove or not
+            int random = new Random().nextInt(10);
+            if (random == 0) {
+                n.remove();
+                System.out.println("Line " + currentLine + " : REMOVE " + n);
+                return null;
+            }
+        }
+        return super.visit(n, arg);
+    }
+
+    @Override
+    public Visitable visit(AssertStmt n, Void arg) {
+        if (!shouldSkip(n)) {
+            // Statement removal (SR)
             // randomly choose to remove or not
             int random = new Random().nextInt(10);
             if (random == 0) {
