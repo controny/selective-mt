@@ -17,6 +17,7 @@ import com.github.javaparser.ast.visitor.Visitable;
 
 
 public class MutationOperator extends ModifierVisitor<Void> {
+    private long randomSeed = 123;
     private AridNodeDetector aridDetector;
     private int currentLine;
     private BinaryExpr.Operator[] arithmeticOperators = {
@@ -84,7 +85,7 @@ public class MutationOperator extends ModifierVisitor<Void> {
     public Visitable visit(NameExpr n, Void arg) {
         if (!shouldSkip(n)) {
             // randomly choose to insert or not
-            int random = new Random().nextInt(10);
+            int random = new Random(randomSeed).nextInt(3);
             if (random == 0) {
                 NameExpr ori = n.clone();
                 Node replacement = insertUnaryOperator(n);
@@ -101,7 +102,7 @@ public class MutationOperator extends ModifierVisitor<Void> {
         if (!shouldSkip(n)) {
             // Statement removal (SR)
             // randomly choose to remove or not
-            int random = new Random().nextInt(10);
+            int random = new Random(randomSeed).nextInt(2);
             if (random == 0) {
                 n.remove();
                 System.out.println("Line " + currentLine + " : REMOVE " + n);
@@ -116,7 +117,7 @@ public class MutationOperator extends ModifierVisitor<Void> {
         if (!shouldSkip(n)) {
             // Statement removal (SR)
             // randomly choose to remove or not
-            int random = new Random().nextInt(10);
+            int random = new Random(randomSeed).nextInt(2);
             if (random == 0) {
                 n.remove();
                 System.out.println("Line " + currentLine + " : REMOVE " + n);
@@ -147,8 +148,9 @@ public class MutationOperator extends ModifierVisitor<Void> {
 
     private int pickReplacementIndex(int opSize, int oriIndex) {
         int randomIndex = oriIndex;
+        Random randomGen = new Random(randomSeed);
         do {
-            randomIndex = new Random().nextInt(opSize);
+            randomIndex = randomGen.nextInt(opSize);
         } while (randomIndex == oriIndex);
         return randomIndex;
     }

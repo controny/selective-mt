@@ -26,7 +26,7 @@ public class MutationTestingTool {
         MutationGenerator generator = new MutationGenerator(ast, aridNodeDetector, maxMutations);
         Set<CompilationUnit> mutants = new HashSet<>();
         Set<CompilationUnit> selectiveMutants = new HashSet<>();
-        int index = 1, cnt = 1;
+        int index = 1;
         File testFile = new File(javaFilePath.replace("Sample", "SampleTest"));
         // get the test file content
         try {
@@ -34,17 +34,14 @@ public class MutationTestingTool {
             // get the output directory
             String outDir = testFile.getParent();
             for (CompilationUnit mutatedAst : generator) {
-                System.out.println("================");
-                System.out.println("Mutant " + index + ":");
-                if (mutatedAst.toString().equals(ast.toString())) {
-                    System.out.println("No mutation");
-                } else {
-                    System.out.println(mutatedAst);
-                    writeMutants(mutatedAst, testCode, outDir, cnt);
+                if (!mutatedAst.toString().equals(ast.toString())) {
+                    System.out.println("Mutant " + index);
+                    System.out.println("================\n");
+                    // System.out.println(mutatedAst);
+                    writeMutants(mutatedAst, testCode, outDir, index);
                     mutants.add(mutatedAst);
-                    cnt++;
+                    index++;
                 }
-                index++;
             }
         } catch (IOException e){
             e.printStackTrace();
