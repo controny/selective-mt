@@ -19,7 +19,7 @@ public class MutationGenerator implements Iterable<CompilationUnit> {
         // the max number of mutations should no exceed the total number of lines
         if (originalAST.getRange().isPresent()) {
             int totalLines = originalAST.getRange().get().end.line;
-            System.err.println("Total lines of code: " + totalLines);
+            System.err.println("Total lines of code: " + totalLines + "\n");
             if (totalLines < maxMutations) {
                 maxMutations = totalLines;
             }

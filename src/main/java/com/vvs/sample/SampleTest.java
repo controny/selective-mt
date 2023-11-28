@@ -44,7 +44,6 @@ public class SampleTest {
             calculator.divide(8, 0);
             fail("Expected ArithmeticException");
         } catch (Exception e) {
-            System.out.println("e message: " + e.getMessage());
             assertTrue(e.getMessage().contains("Division by zero"));
         }
     }

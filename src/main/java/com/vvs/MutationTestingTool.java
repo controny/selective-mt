@@ -18,14 +18,19 @@ public class MutationTestingTool {
 
     }
 
-    public void run(String javaFilePath, int maxMutations) {
+    public void run(String javaFilePath, int maxMutations, boolean isSelective) {
         CodeParser parser = new CodeParser(javaFilePath);
         CompilationUnit ast = parser.getAST();
         System.out.println("Original:\n" + ast);
-        AridNodeDetector aridNodeDetector = new AridNodeDetector(ast);
+        AridNodeDetector aridNodeDetector = null;
+        if (isSelective) {
+            System.out.println("[Selective Mutation Testing]");
+            aridNodeDetector = new AridNodeDetector(ast);
+        } else {
+            System.out.println("[Normal Mutation Testing]");
+            aridNodeDetector = new DummyAridNodeDetector(ast);
+        }
         MutationGenerator generator = new MutationGenerator(ast, aridNodeDetector, maxMutations);
-        Set<CompilationUnit> mutants = new HashSet<>();
-        Set<CompilationUnit> selectiveMutants = new HashSet<>();
         int index = 1;
         File testFile = new File(javaFilePath.replace("Sample", "SampleTest"));
         // get the test file content
@@ -39,7 +44,6 @@ public class MutationTestingTool {
                     System.out.println("================\n");
                     // System.out.println(mutatedAst);
                     writeMutants(mutatedAst, testCode, outDir, index);
-                    mutants.add(mutatedAst);
                     index++;
                 }
             }

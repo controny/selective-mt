@@ -77,6 +77,8 @@ public class MutationOperator extends ModifierVisitor<Void> {
                     break;
                 }
             } 
+        } else {
+            return n;
         }
         return super.visit(n, arg);
     }
@@ -97,20 +99,20 @@ public class MutationOperator extends ModifierVisitor<Void> {
         return super.visit(n, arg);
     }
 
-    @Override
-    public Visitable visit(BlockStmt n, Void arg) {
-        if (!shouldSkip(n)) {
-            // Statement removal (SR)
-            // randomly choose to remove or not
-            int random = new Random(randomSeed).nextInt(2);
-            if (random == 0) {
-                n.remove();
-                System.out.println("Line " + currentLine + " : REMOVE " + n);
-                return null;
-            }
-        }
-        return super.visit(n, arg);
-    }
+    // @Override
+    // public Visitable visit(BlockStmt n, Void arg) {
+    //     if (!shouldSkip(n)) {
+    //         // Statement removal (SR)
+    //         // randomly choose to remove or not
+    //         int random = new Random(randomSeed).nextInt(2);
+    //         if (random == 0) {
+    //             n.remove();
+    //             System.out.println("Line " + currentLine + " : REMOVE " + n);
+    //             return null;
+    //         }
+    //     }
+    //     return super.visit(n, arg);
+    // }
 
     @Override
     public Visitable visit(AssertStmt n, Void arg) {
@@ -123,6 +125,8 @@ public class MutationOperator extends ModifierVisitor<Void> {
                 System.out.println("Line " + currentLine + " : REMOVE " + n);
                 return null;
             }
+        } else {
+            return n;
         }
         return super.visit(n, arg);
     }
