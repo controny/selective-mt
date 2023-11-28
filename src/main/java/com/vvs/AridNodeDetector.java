@@ -2,6 +2,7 @@ package com.vvs;
 
 import com.github.javaparser.ast.CompilationUnit;
 import com.github.javaparser.ast.Node;
+import com.github.javaparser.ast.stmt.Statement;
 
 
 public class AridNodeDetector {
@@ -12,7 +13,12 @@ public class AridNodeDetector {
     }
 
     public boolean isArid(Node node) {
-        String str = node.getParentNode().toString();
+        String str = null;
+        if (node instanceof Statement) {
+            str = node.toString();
+        } else {
+            str = node.getParentNode().toString();
+        }
         // Block Statment => arid
         // if(str.contains("{") || str.contains("}")){
         //     return true;

@@ -12,8 +12,13 @@ import com.github.javaparser.ast.expr.NameExpr;
 import com.github.javaparser.ast.expr.UnaryExpr;
 import com.github.javaparser.ast.stmt.AssertStmt;
 import com.github.javaparser.ast.stmt.BlockStmt;
+import com.github.javaparser.ast.stmt.ForStmt;
+import com.github.javaparser.ast.stmt.IfStmt;
+import com.github.javaparser.ast.stmt.WhileStmt;
 import com.github.javaparser.ast.visitor.ModifierVisitor;
 import com.github.javaparser.ast.visitor.Visitable;
+
+import javassist.compiler.ast.Stmnt;
 
 
 public class MutationOperator extends ModifierVisitor<Void> {
@@ -99,34 +104,38 @@ public class MutationOperator extends ModifierVisitor<Void> {
         return super.visit(n, arg);
     }
 
-    // @Override
-    // public Visitable visit(BlockStmt n, Void arg) {
-    //     if (!shouldSkip(n)) {
-    //         // Statement removal (SR)
-    //         // randomly choose to remove or not
-    //         int random = new Random(randomSeed).nextInt(2);
-    //         if (random == 0) {
-    //             n.remove();
-    //             System.out.println("Line " + currentLine + " : REMOVE " + n);
-    //             return null;
-    //         }
-    //     }
-    //     return super.visit(n, arg);
-    // }
+    @Override
+    public Visitable visit(ForStmt n, Void arg) {
+        Visitable toReturn = stmtRemove(n, arg);
+        if (toReturn == null || toReturn == n) {
+            return toReturn;
+        }
+        return super.visit(n, arg);
+    }
+
+    @Override
+    public Visitable visit(IfStmt n, Void arg) {
+        Visitable toReturn = stmtRemove(n, arg);
+        if (toReturn == null || toReturn == n) {
+            return toReturn;
+        }
+        return super.visit(n, arg);
+    }
+
+    @Override
+    public Visitable visit(WhileStmt n, Void arg) {
+        Visitable toReturn = stmtRemove(n, arg);
+        if (toReturn == null || toReturn == n) {
+            return toReturn;
+        }
+        return super.visit(n, arg);
+    }
 
     @Override
     public Visitable visit(AssertStmt n, Void arg) {
-        if (!shouldSkip(n)) {
-            // Statement removal (SR)
-            // randomly choose to remove or not
-            int random = new Random(randomSeed).nextInt(2);
-            if (random == 0) {
-                n.remove();
-                System.out.println("Line " + currentLine + " : REMOVE " + n);
-                return null;
-            }
-        } else {
-            return n;
+        Visitable toReturn = stmtRemove(n, arg);
+        if (toReturn == null || toReturn == n) {
+            return toReturn;
         }
         return super.visit(n, arg);
     }
@@ -148,6 +157,23 @@ public class MutationOperator extends ModifierVisitor<Void> {
         }
 
         return false;
+    }
+
+    public Visitable stmtRemove(Node n, Void arg) {
+        if (!shouldSkip(n)) {
+            // Statement removal (SR)
+            // randomly choose to remove or not
+            int random = new Random(randomSeed).nextInt(2);
+            if (random == 0) {
+                n.remove();
+                System.out.println("Line " + currentLine + " : REMOVE " + n);
+                return null;
+            }
+        } else {
+            return n;
+        }
+        // return a dummy node
+        return n.getParentNode().get();
     }
 
     private int pickReplacementIndex(int opSize, int oriIndex) {
