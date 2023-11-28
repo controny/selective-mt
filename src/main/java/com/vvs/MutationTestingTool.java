@@ -30,9 +30,10 @@ public class MutationTestingTool {
             if (mutatedAst.toString().equals(ast.toString())) {
                 System.out.println("No mutation");
             } else {
+                mutatedAst.setPackageDeclaration("com.vvs");
                 System.out.println(mutatedAst);
-                writeMutants(mutatedAst,cnt);
                 mutants.add(mutatedAst);
+                writeMutants(mutatedAst,cnt);
                 cnt++;
             }
             index++;
