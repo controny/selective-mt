@@ -26,9 +26,10 @@ public class ReportGenerator {
             sb = new StringBuffer();
             try {
                 String className = "com.vvs.sample.Mutant" + (total + 1) + "Test";
+                Class testClass = Class.forName(className);
                 System.out.println("\n===================\n");
                 System.out.println("Testing " + className + "\n");
-                Result mutantsResult = jUnitCore.run(Class.forName(className));
+                Result mutantsResult = jUnitCore.run(testClass);
                 for (Failure failure : mutantsResult.getFailures()) {
                     sb.append(failure.getTestHeader() + " ");
                 }
