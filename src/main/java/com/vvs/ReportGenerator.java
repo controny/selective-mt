@@ -51,7 +51,7 @@ public class ReportGenerator {
         System.out.println("Total #Mutants: " + total);
         System.out.println("Total #Survival: " + (total - detected));
         System.out.println("Total #Killed: " + detected);
-        System.out.println("Mutants score: " + String.format("%.2f", 1.0 * detected / total));
+        System.out.println("Mutation Score: " + String.format("%.2f", 1.0 * detected / total));
         System.out.println("*******************************\n\n");
     }
 
